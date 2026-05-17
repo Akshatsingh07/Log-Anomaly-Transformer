@@ -221,3 +221,4 @@ __marimo__/
 venv/
 .DS_Store
 *.csv
+*.pkl
