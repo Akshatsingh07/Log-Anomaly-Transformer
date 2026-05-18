@@ -151,7 +151,10 @@ def score_sequence(model, vectorizer, text):
     return seq_score, token_loss_pairs
 
 def loss_to_color(loss, max_loss):
-    ratio = 0 if max_loss == 0 else min(loss / max_loss, 1.0)
+    if max_loss < 0.01:
+        ratio = 0.0
+    else:
+        ratio = min(loss / max_loss, 1.0)
 
     if ratio < 0.3:
         r, g, b = 15, 45, 26
@@ -408,48 +411,21 @@ if analyze_btn and log_input.strip():
         top_n = min(5, len(sorted_pairs))
 
         cols = st.columns(top_n)
-
-        for i, (tok, loss) in enumerate(sorted_pairs[:top_n]):
-
+    for i, (tok, loss) in enumerate(sorted_pairs[:top_n]):
             with cols[i]:
-
-                ratio = loss / max_loss if max_loss > 0 else 0
-
-                bar = (
-                    "█" * int(ratio * 10)
-                    + "░" * (10 - int(ratio * 10))
-                )
-
+                ratio = loss / max_loss if max_loss > 0.01 else 0.0
+                
+                bar = "█" * int(ratio * 10) + "░" * (10 - int(ratio * 10))
+                
                 colour = (
-                    "#f85149"
-                    if ratio > 0.65
-                    else "#e3b341"
-                    if ratio > 0.3
+                    "#f85149" if ratio > 0.65 
+                    else "#e3b341" if ratio > 0.3 
                     else "#7ee787"
                 )
 
-                st.markdown(
-                    f'''
-                    <div class="metric-card">
-                        <div class="metric-val"
-                             style="color:{colour};font-size:1.1rem">
-                            {tok}
-                        </div>
-
-                        <div style="
-                            font-family:monospace;
-                            font-size:11px;
-                            color:{colour}">
-                            {bar}
-                        </div>
-
-                        <div class="metric-lbl">
-                            loss: {loss:.4f}
-                        </div>
-                    </div>
-                    ''',
-                    unsafe_allow_html=True
-                )
+                html_card = f'<div class="metric-card"><div class="metric-val" style="color:{colour};font-size:1.1rem">{tok}</div><div style="font-family:monospace;font-size:11px;color:{colour}">{bar}</div><div class="metric-lbl">loss: {loss:.4f}</div></div>'
+                
+                st.markdown(html_card, unsafe_allow_html=True)
 
     else:
         st.warning(
