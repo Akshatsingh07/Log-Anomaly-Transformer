@@ -94,7 +94,7 @@ def load_vectorizer():
 @st.cache_data
 def load_threshold():
     try:
-        with open("anomaly_thresholds.txt","rb") as f:
+        with open("anomaly_threshold.txt","rb") as f:
             return float(f.read().strip())
     except Exception as e:
        return 1e-9
@@ -383,16 +383,7 @@ if analyze_btn and log_input.strip():
         for tok, loss in token_loss_pairs:
 
             style = loss_to_color(loss, max_loss)
-
-            chips += (
-                f'''
-                <span class="token-chip"
-                      style="{style}"
-                      title="loss: {loss:.4f}">
-                    {tok}
-                </span>
-                '''
-            )
+            chips += f'<span class="token-chip" style="{style}" title="loss: {loss:.4f}">{tok}</span>'
 
         st.markdown(
             f'<div class="token-row">{chips}</div>',
